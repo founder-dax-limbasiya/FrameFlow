@@ -1,7 +1,5 @@
 # Third-party notices
 
-The web MVP is built entirely with native browser APIs. No third-party runtime video-processing library, build dependency, or model weights are bundled.
+The web MVP uses native browser APIs (IndexedDB, Canvas, Canvas Capture Stream and MediaRecorder). No third-party runtime video-processing libraries, paid APIs, model weights or external font files are bundled.
 
-- **DM Mono** and **Manrope** — SIL Open Font License 1.1, loaded from Google Fonts in the current version.
-
-The FrameFlow application source in this repository is released under the MIT License. See `LICENSE`.
+The FrameFlow application source is released under the MIT License. See `LICENSE`.
