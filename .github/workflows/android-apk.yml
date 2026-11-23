@@ -35,7 +35,7 @@ jobs:
         with:
           packages: "platform-tools"
 
-      - name: Install Android 37 SDK
+      - name: Install Android 36 SDK
         shell: bash
         run: |
           yes | sdkmanager --licenses >/dev/null || true
