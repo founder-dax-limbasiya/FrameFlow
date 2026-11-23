@@ -45,13 +45,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.6.0"
-          cache-provider: basic
 
       - name: Restore native Android project
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/frameflow-source"
-          cat android/native-source.parts/*.b64 | base64 --decode > "$RUNNER_TEMP/frameflow-native.tar.gz"
+          cat android/native-source.parts/*.b64 | base64 --decode > "$RUNNER_TEMP/frameflow-transport.gz"
+          # The source tar.gz is gzip-compressed once more for transport; unwrap the outer layer first.
+          gzip -dc "$RUNNER_TEMP/frameflow-transport.gz" > "$RUNNER_TEMP/frameflow-native.tar.gz"
           tar -tzf "$RUNNER_TEMP/frameflow-native.tar.gz"
           tar -xzf "$RUNNER_TEMP/frameflow-native.tar.gz" -C "$RUNNER_TEMP/frameflow-source"
           # API 37 is not yet published in the runner's SDK package feed; use stable API 36 for this build.
