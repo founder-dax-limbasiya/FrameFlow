@@ -59,6 +59,9 @@ jobs:
           sed -i 's/compileSdk = 37/compileSdk = 36/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/build.gradle.kts"
           # Compose 1.12+ requires compileSdk 37; use the April 2026 stable BOM for API 36 builds.
           sed -i 's/compose-bom:2026.09.00/compose-bom:2026.04.01/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/build.gradle.kts"
+          sed -i 's/lifecycle-runtime-ktx:2.11.0/lifecycle-runtime-ktx:2.10.0/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/build.gradle.kts"
+          sed -i 's/lifecycle-runtime-compose:2.11.0/lifecycle-runtime-compose:2.10.0/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/build.gradle.kts"
+          sed -i 's/import androidx.media3.effect.Effects/import androidx.media3.transformer.Effects/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/src/main/java/ai/frameflow/app/MediaExporter.kt"
 
       - name: Run tests and build debug APK
         working-directory: ${{ runner.temp }}/frameflow-source/frameflow_android
