@@ -7,6 +7,7 @@ on:
       - "android/native-source.parts/**"
       - "android/script-source-overlay.parts/**"
       - "android/script-fix-overlay.parts/**"
+      - "android/flux-open-model-overlay.parts/**"
       - ".github/workflows/android-apk.yml"
   workflow_dispatch:
 
@@ -65,6 +66,12 @@ jobs:
           cat android/script-fix-overlay.parts/*.b64 | base64 --decode > "$RUNNER_TEMP/frameflow-script-fix-overlay.tar.xz"
           tar -tJf "$RUNNER_TEMP/frameflow-script-fix-overlay.tar.xz"
           tar -xJf "$RUNNER_TEMP/frameflow-script-fix-overlay.tar.xz" -C "$RUNNER_TEMP/frameflow-source"
+          # Restore the FLUX.2 Klein open-weight image generation integration.
+          mkdir -p "$RUNNER_TEMP/frameflow-flux-overlay"
+          cat android/flux-open-model-overlay.parts/*.b64 | base64 --decode > "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz"
+          tar -tJf "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz"
+          tar -xJf "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz" -C "$RUNNER_TEMP/frameflow-source"
+          rm -f "$RUNNER_TEMP/frameflow-source/frameflow_android/app/src/main/java/ai/frameflow/app/AiHordeImageGenerator.kt"
           # API 37 is not yet published in the runner's SDK package feed; use stable API 36 for this build.
           sed -i 's/compileSdk = 37/compileSdk = 36/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/build.gradle.kts"
           # Compose 1.12+ requires compileSdk 37; use the April 2026 stable BOM for API 36 builds.
