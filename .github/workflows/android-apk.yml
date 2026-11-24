@@ -72,8 +72,9 @@ jobs:
           tar -tJf "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz"
           tar -xJf "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz" -C "$RUNNER_TEMP/frameflow-source"
           python3 - <<'PY'
+          import os
           from pathlib import Path
-          p = Path("$RUNNER_TEMP/frameflow-source/frameflow_android/app/src/main/java/ai/frameflow/app/MainActivity.kt")
+          p = Path(os.environ["RUNNER_TEMP"]) / "frameflow-source/frameflow_android/app/src/main/java/ai/frameflow/app/MainActivity.kt"
           s = p.read_text()
           old = "A 1 MP reference + 1 MP output edit is about US$0.018 on the published fal.ai price example."
           new = "fal.ai bills hosted generation per megapixel; check the live FLUX.2 Klein price before long videos."
