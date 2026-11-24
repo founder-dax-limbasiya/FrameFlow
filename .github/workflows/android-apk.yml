@@ -71,6 +71,17 @@ jobs:
           cat android/flux-open-model-overlay.parts/*.b64 | base64 --decode > "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz"
           tar -tJf "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz"
           tar -xJf "$RUNNER_TEMP/frameflow-flux-overlay.tar.xz" -C "$RUNNER_TEMP/frameflow-source"
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("$RUNNER_TEMP/frameflow-source/frameflow_android/app/src/main/java/ai/frameflow/app/MainActivity.kt")
+          s = p.read_text()
+          old = "A 1 MP reference + 1 MP output edit is about US$0.018 on the published fal.ai price example."
+          new = "fal.ai bills hosted generation per megapixel; check the live FLUX.2 Klein price before long videos."
+          if old not in s:
+              raise SystemExit("Expected FLUX pricing disclosure was not found")
+          p.write_text(s.replace(old, new))
+          PY
+          
           rm -f "$RUNNER_TEMP/frameflow-source/frameflow_android/app/src/main/java/ai/frameflow/app/AiHordeImageGenerator.kt"
           # API 37 is not yet published in the runner's SDK package feed; use stable API 36 for this build.
           sed -i 's/compileSdk = 37/compileSdk = 36/' "$RUNNER_TEMP/frameflow-source/frameflow_android/app/build.gradle.kts"
