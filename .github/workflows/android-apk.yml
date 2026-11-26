@@ -86,7 +86,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          command -v ninja >/dev/null 2>&1 || sudo apt-get update && sudo apt-get install -y ninja-build
+          if ! command -v ninja >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y ninja-build; fi
           NEZUMI_ROOT="$RUNNER_TEMP/nezumi-ai"
           git clone --filter=blob:none --depth 1 --sparse https://github.com/mouse0329/nezumi-ai.git "$NEZUMI_ROOT"
           git -C "$NEZUMI_ROOT" sparse-checkout set mnn-sd-engine
@@ -97,27 +97,10 @@ jobs:
           ENGINE_BUILD="$RUNNER_TEMP/mnn-sd-android"
           test -f "$MNN_ROOT/CMakeLists.txt"
           test -f "$NDK/build/cmake/android.toolchain.cmake"
-          cmake -S "$MNN_ROOT" -B "$MNN_BUILD" -G Ninja \\
-            -DCMAKE_MAKE_PROGRAM="$(command -v ninja)" \\
-            -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \\
-            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-30 -DANDROID_STL=c++_static \\
-            -DCMAKE_BUILD_TYPE=Release -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" \\
-            -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \\
-            -DMNN_USE_LOGCAT=ON -DMNN_OPENCL=ON -DMNN_SEP_BUILD=OFF \\
-            -DMNN_BUILD_FOR_ANDROID_COMMAND=ON -DMNN_LOW_MEMORY=ON \\
-            -DMNN_BUILD_TEST=OFF -DMNN_BUILD_BENCHMARK=OFF -DMNN_BUILD_TOOLS=OFF \\
-            -DMNN_BUILD_QUANTOOLS=OFF -DMNN_BUILD_CONVERTER=OFF -DMNN_BUILD_TRAIN=OFF \\
-            -DMNN_BUILD_DEMO=OFF -DMNN_BUILD_LLM=OFF -DMNN_BUILD_DIFFUSION=OFF
+          cmake -S "$MNN_ROOT" -B "$MNN_BUILD" -G Ninja -DCMAKE_MAKE_PROGRAM="$(command -v ninja)" -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-30 -DANDROID_STL=c++_static -DCMAKE_BUILD_TYPE=Release -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON -DMNN_USE_LOGCAT=ON -DMNN_OPENCL=ON -DMNN_SEP_BUILD=OFF -DMNN_BUILD_FOR_ANDROID_COMMAND=ON -DMNN_LOW_MEMORY=ON -DMNN_BUILD_TEST=OFF -DMNN_BUILD_BENCHMARK=OFF -DMNN_BUILD_TOOLS=OFF -DMNN_BUILD_QUANTOOLS=OFF -DMNN_BUILD_CONVERTER=OFF -DMNN_BUILD_TRAIN=OFF -DMNN_BUILD_DEMO=OFF -DMNN_BUILD_LLM=OFF -DMNN_BUILD_DIFFUSION=OFF
           cmake --build "$MNN_BUILD" --target MNN -j2
           test -f "$MNN_BUILD/libMNN.so"
-          cmake -S "$NEZUMI_ROOT/mnn-sd-engine" -B "$ENGINE_BUILD" -G Ninja \\
-            -DCMAKE_MAKE_PROGRAM="$(command -v ninja)" \\
-            -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \\
-            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-30 -DANDROID_STL=c++_static \\
-            -DCMAKE_BUILD_TYPE=Release -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" \\
-            -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \\
-            -DMNN_ROOT="$MNN_ROOT" -DMNN_ANDROID_LIB="$MNN_BUILD/libMNN.so" \\
-            -DMNN_SD_BUILD_PROBE_CLI=OFF
+          cmake -S "$NEZUMI_ROOT/mnn-sd-engine" -B "$ENGINE_BUILD" -G Ninja -DCMAKE_MAKE_PROGRAM="$(command -v ninja)" -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-30 -DANDROID_STL=c++_static -DCMAKE_BUILD_TYPE=Release -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON -DMNN_ROOT="$MNN_ROOT" -DMNN_ANDROID_LIB="$MNN_BUILD/libMNN.so" -DMNN_SD_BUILD_PROBE_CLI=OFF
           cmake --build "$ENGINE_BUILD" --target mnn_sd_engine mnn_sd_jni -j2
           JNI_DEST="$RUNNER_TEMP/frameflow-source/frameflow_android/app/src/main/jniLibs/arm64-v8a"
           mkdir -p "$JNI_DEST"
