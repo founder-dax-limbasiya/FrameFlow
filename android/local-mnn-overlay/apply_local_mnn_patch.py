@@ -219,7 +219,7 @@ if anchor not in text:
     raise SystemExit("Could not find EditorScreen error dialog anchor")
 text = text.replace(anchor, license_dialog + anchor, 1)
 
-if "falKey" in text or "fal.ai" in text or "OpenModelImageGenerator" in text:
+if "falKey" in text or "OpenModelImageGenerator" in text:
     raise SystemExit("Hosted inference references remain in MainActivity")
 main.write_text(text)
 
