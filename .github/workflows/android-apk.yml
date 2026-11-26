@@ -88,7 +88,7 @@ jobs:
           set -euo pipefail
           command -v ninja >/dev/null 2>&1 || sudo apt-get update && sudo apt-get install -y ninja-build
           NEZUMI_ROOT="$RUNNER_TEMP/nezumi-ai"
-          git clone --filter=blob:none --depth 1 --sparse --recurse-submodules --shallow-submodules https://github.com/mouse0329/nezumi-ai.git "$NEZUMI_ROOT"
+          git clone --filter=blob:none --depth 1 --sparse https://github.com/mouse0329/nezumi-ai.git "$NEZUMI_ROOT"
           git -C "$NEZUMI_ROOT" sparse-checkout set mnn-sd-engine third_party/MNN
           git -C "$NEZUMI_ROOT" submodule update --init --depth 1 third_party/MNN
           MNN_ROOT="$NEZUMI_ROOT/third_party/MNN"
