@@ -7,7 +7,8 @@ main = root / "app/src/main/java/ai/frameflow/app/MainActivity.kt"
 text = main.read_text()
 text = text.replace("import android.content.Intent\n", "")
 text = text.replace("import androidx.compose.ui.text.input.PasswordVisualTransformation\n", "")
-text = text.replace('    var falKey by remember { mutableStateOf("") }\n', '''    val modelPreferences = remember { context.getSharedPreferences("frameflow-local-models", 0) }
+text = text.replace('    var hordeKey by remember { mutableStateOf("") }\n', '''
+    val modelPreferences = remember { context.getSharedPreferences("frameflow-local-models", 0) }
     var modelInstalled by remember(project.id) { mutableStateOf(LocalImageModelManager.isInstalled(context)) }
     var modelLicenseAccepted by remember {
         mutableStateOf(modelPreferences.getBoolean("majicmix_openrail_accepted", false))
@@ -15,9 +16,42 @@ text = text.replace('    var falKey by remember { mutableStateOf("") }\n', '''  
     var showModelLicense by remember { mutableStateOf(false) }
 ''')
 
-engine_start = text.index('                Surface(\n', text.index('SectionHeading("04 · VIDEO FORMAT"'))
-engine_end = text.index('                Spacer(Modifier.height(20.dp))\n                SectionHeading("05 · VISUAL CONTINUITY"', engine_start)
-engine_block = '''                Surface(
+section_start = text.index('                SectionHeading("04 · VIDEO FORMAT"')
+section_end = text.index('                SectionHeading("05 · VISUAL CONTINUITY"', section_start)
+video_section = '''
+                SectionHeading("04 · VIDEO FORMAT", "Choose the platform for the final MP4")
+                Spacer(Modifier.height(9.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FrameAspect.values().forEach { option ->
+                        val selected = option == aspect
+                        Surface(
+                            modifier = Modifier.weight(1f).clip(RoundedCornerShape(11.dp)).clickable(enabled = !isWorking) {
+                                aspect = option
+                                onChange(project.copy(script = script, languageTag = languageTag, aspect = option))
+                            },
+                            color = if (selected) AccentSoft else SurfaceDark,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) Accent else Stroke),
+                            shape = RoundedCornerShape(11.dp)
+                        ) {
+                            Column(Modifier.padding(vertical = 15.dp, horizontal = 7.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(option.label, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (selected) Accent else Color.White)
+                                Spacer(Modifier.height(5.dp))
+                                Text(
+                                    when (option) {
+                                        FrameAspect.PORTRAIT -> "Reels / Shorts"
+                                        FrameAspect.LANDSCAPE -> "YouTube"
+                                        FrameAspect.SQUARE -> "Square"
+                                    },
+                                    color = SecondaryText,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+                Surface(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp)).clickable { showAdvanced = !showAdvanced },
                     color = SurfaceDark,
                     border = androidx.compose.foundation.BorderStroke(1.dp, Stroke)
@@ -37,22 +71,17 @@ engine_block = '''                Surface(
                 }
                 if (showAdvanced) {
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        "The model runs on this phone with MNN (OpenCL when available, CPU fallback). It is downloaded once, stored in app storage, and used locally for every frame. No fal.ai, AI Horde, inference API, account or API key. The first download needs internet; after installation, image generation works offline.",
-                        color = SecondaryText, fontSize = 10.sp, lineHeight = 15.sp
-                    )
+                    Text("The model runs on this phone with MNN (OpenCL when available, CPU fallback). It is downloaded once, stored in app storage, and used locally for every frame. No inference API or API key. The first download needs internet; after installation, image generation works offline.", color = SecondaryText, fontSize = 10.sp, lineHeight = 15.sp)
                     Spacer(Modifier.height(5.dp))
-                    Text(
-                        "Model download: about 1.18 GB; extracted files about 1.3 GB. Model card recommends 6 GB+ RAM and 5 GB free storage (4 GB RAM / 3 GB free minimum).",
-                        color = SecondaryText, fontSize = 10.sp, lineHeight = 15.sp
-                    )
+                    Text("Model download: about 1.18 GB; extracted files about 1.3 GB. Model card recommends 6 GB+ RAM and 5 GB free storage (4 GB RAM / 3 GB free minimum).", color = SecondaryText, fontSize = 10.sp, lineHeight = 15.sp)
                     TextButton(onClick = { showModelLicense = true }, enabled = !isWorking) {
                         Text("Model licence & attribution", color = Accent, fontSize = 11.sp)
                     }
                 }
 
+                Spacer(Modifier.height(20.dp))
 '''
-text = text[:engine_start] + engine_block + text[engine_end:]
+text = text[:section_start] + video_section + text[section_end:]
 
 button_start = text.index('                    Button(\n                        onClick = {', text.index('if (isWorking)'))
 modifier_at = text.index('                        modifier = Modifier.fillMaxWidth().height(54.dp)', button_start)
@@ -69,7 +98,7 @@ button_prefix = '''                    Button(
 '''
 text = text[:button_start] + button_prefix + text[modifier_at:]
 
-old_footer = 'Text("FLUX.2 Klein 4B creates one image per narration second. Every later frame edits the previous image using the next script moment. Generation is sequential and billed by image input/output size; check fal.ai pricing before long videos.", color = SecondaryText, fontSize = 9.sp, lineHeight = 14.sp)'
+old_footer = 'Text("One image is generated for every narration second. Frame one establishes the scene; each later image edits the previous frame using the next script moment. The model runs locally after its first download.", color = SecondaryText, fontSize = 9.sp, lineHeight = 14.sp)'
 new_footer = 'Text("One image is generated for every narration second. Frame one establishes the scene; each later image edits the previous frame using the next script moment. The model runs locally after its first download.", color = SecondaryText, fontSize = 9.sp, lineHeight = 14.sp)'
 text = text.replace(old_footer, new_footer)
 
