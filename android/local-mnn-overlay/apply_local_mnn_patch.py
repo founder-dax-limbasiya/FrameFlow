@@ -98,7 +98,7 @@ button_prefix = '''                    Button(
 '''
 text = text[:button_start] + button_prefix + text[modifier_at:]
 
-old_footer = 'Text("One image is generated for every narration second. Frame one establishes the scene; each later image edits the previous frame using the next script moment. The model runs locally after its first download.", color = SecondaryText, fontSize = 9.sp, lineHeight = 14.sp)'
+old_footer = 'Text("AI Horde generates the visuals online. Each image uses the previous frame as a visual reference to maintain continuity. Narration audio, captions and the finished video stay on this phone. Free community workers may queue slowly.", color = SecondaryText, fontSize = 9.sp, lineHeight = 14.sp)'
 new_footer = 'Text("One image is generated for every narration second. Frame one establishes the scene; each later image edits the previous frame using the next script moment. The model runs locally after its first download.", color = SecondaryText, fontSize = 9.sp, lineHeight = 14.sp)'
 text = text.replace(old_footer, new_footer)
 
