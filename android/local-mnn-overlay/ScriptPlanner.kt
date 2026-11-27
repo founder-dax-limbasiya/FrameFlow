@@ -95,7 +95,7 @@ object ScriptPlanner {
         val nextSentence = beats.drop(beatIndex + 1)
             .firstOrNull { it.sentenceIndex != beat.sentenceIndex }
             ?.sourceWords.orEmpty()
-        val fullStory = beats.map { it.sourceWords }.distinctByIndexedSentence()
+        val fullStory = beats.distinctByIndexedSentence()
             .joinToString(" ").replace(Regex("\\s+"), " ").trim().take(2_400)
         val neighboringContext = listOf(previousSentence, beat.sourceWords, nextSentence)
             .filter { it.isNotBlank() }
